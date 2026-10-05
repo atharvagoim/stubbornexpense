@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Expense Tracker</title>
+<meta name="description" content="See where your money goes. Track your expenses.">
+<link rel="preload" href="fonts/42dot-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/42dot-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="img/face1.jpg" as="image">
+<link rel="preload" href="img/face2.jpg" as="image">
+<link rel="preload" href="img/face3.jpg" as="image">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============ get started (frame 1:2) ============ -->
+  <section class="screen s-start" id="s-start" hidden>
+    <div class="faces" aria-hidden="true"><img class="face on" src="img/face1.jpg" alt=""><img class="face" src="img/face2.jpg" alt=""><img class="face" src="img/face3.jpg" alt=""></div>
+    <div class="fade"></div>
+    <p class="start-text"><span>see where your money goes</span><span>Track your expenses</span></p>
+    <button class="btn btn-start" id="go-start"><span>Get Started</span></button>
+  </section>
+
+  <!-- ============ login (frame 2:15) ============ -->
+  <section class="screen s-login" id="s-login" hidden>
+    <div class="faces" aria-hidden="true"><img class="face on" src="img/face1.jpg" alt=""><img class="face" src="img/face2.jpg" alt=""><img class="face" src="img/face3.jpg" alt=""></div>
+    <div class="fade"></div>
+    <p class="login-text">Start tracking now</p>
+    <button class="btn btn-login" id="go-login"><span>Login</span></button>
+    <button class="btn btn-signup" id="go-signup"><span>Sign up</span></button>
+  </section>
+
+  <!-- ============ login page (same style as sign up) ============ -->
+  <section class="screen s-signup s-loginpage" id="s-loginpage" hidden>
+    <button class="su-back" id="li-back" type="button" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <form class="su-step" id="li-form" novalidate>
+      <h2>Username or Email ?</h2>
+      <input class="su-in" name="login" placeholder="e.g. atharva_07" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="120" aria-label="Username or email">
+      <h2 class="su-h2b">Password ?</h2>
+      <input class="su-in" name="password" type="password" placeholder="Your password" autocomplete="current-password" maxlength="200" aria-label="Password">
+      <p class="su-err" id="li-err" role="alert"></p>
+      <button class="su-next" type="submit">Login</button>
+      <p class="li-switch">New here? <button type="button" id="li-signup">Sign up</button></p>
+    </form>
+  </section>
+
+  <!-- ============ sign up, one question per screen (iPhone 13 & 14 - 1…5) ============ -->
+  <section class="screen s-signup" id="s-signup" hidden>
+    <button class="su-back" id="su-back" type="button" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="su-dots" id="su-dots"><i></i><i></i><i></i><i></i></div>
+
+    <form class="su-step" data-step="name" novalidate>
+      <h2>Your Name&nbsp; ?</h2>
+      <input class="su-in" name="name" placeholder="Full name" autocomplete="name" maxlength="50" aria-label="Your name">
+      <p class="su-err" role="alert"></p>
+      <button class="su-next" type="submit">Next</button>
+    </form>
+    <form class="su-step" data-step="username" novalidate hidden>
+      <h2>Select your Username?</h2>
+      <input class="su-in" name="username" placeholder="e.g. atharva_07" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" aria-label="Username">
+      <p class="su-hint">3–20 letters, numbers, . or _</p>
+      <p class="su-err" role="alert"></p>
+      <button class="su-next" type="submit">Next</button>
+    </form>
+    <form class="su-step" data-step="email" novalidate hidden>
+      <h2>Your Email id ?</h2>
+      <input class="su-in" name="email" type="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="120" aria-label="Email">
+      <p class="su-err" role="alert"></p>
+      <button class="su-next" type="submit">Next</button>
+    </form>
+    <form class="su-step" data-step="password" novalidate hidden>
+      <h2>Password ?</h2>
+      <input class="su-in" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" maxlength="200" aria-label="Password">
+      <h2 class="su-h2b">Confirm Password</h2>
+      <input class="su-in" name="confirm" type="password" placeholder="Type it again" autocomplete="new-password" maxlength="200" aria-label="Confirm password">
+      <p class="su-err" role="alert"></p>
+      <button class="su-next" type="submit">Create account</button>
+    </form>
+
+    <div class="su-step su-pfp" data-step="pfp" hidden>
+      <button class="su-skip" id="su-skip" type="button">Skip</button>
+      <h2>Select Profile Picture</h2>
+      <div class="su-avatar" id="su-avatar"><svg viewBox="0 0 146 146" aria-hidden="true"><circle cx="73" cy="73" r="73" fill="#fff"/><circle cx="73" cy="58" r="26" fill="#9ea3ad"/><path d="M27 124c6-25 25-38 46-38s40 13 46 38a72 72 0 0 1-92 0Z" fill="#9ea3ad"/></svg><img id="su-avatar-img" alt="" hidden></div>
+      <div class="su-av-btns">
+        <button type="button" id="su-edit"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M8.2 1.4l2.4 2.4-6.6 6.6H1.6V8z" fill="currentColor"/></svg>Edit</button>
+        <button type="button" id="su-remove"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 3h8M4.6 3V1.8h2.8V3M3 3l.6 7.4c0 .5.4.8.9.8h3c.5 0 .9-.3.9-.8L9 3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove</button>
+      </div>
+      <div class="su-grid"><button type="button" class="su-pic" data-src="img/pfp/1.jpg" aria-label="Profile picture 1"><img src="img/pfp/1.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/2.jpg" aria-label="Profile picture 2"><img src="img/pfp/2.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/3.jpg" aria-label="Profile picture 3"><img src="img/pfp/3.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/4.jpg" aria-label="Profile picture 4"><img src="img/pfp/4.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/5.jpg" aria-label="Profile picture 5"><img src="img/pfp/5.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/6.jpg" aria-label="Profile picture 6"><img src="img/pfp/6.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/7.jpg" aria-label="Profile picture 7"><img src="img/pfp/7.jpg" alt="" loading="lazy"></button><button type="button" class="su-pic" data-src="img/pfp/8.jpg" aria-label="Profile picture 8"><img src="img/pfp/8.jpg" alt="" loading="lazy"></button></div>
+    </div>
+  </section>
+
+  <!-- ============ home (frames 2:30 / 4:67) ============ -->
+  <section class="screen s-home" id="s-home" hidden>
+    <button class="me-pic" id="me-pic" aria-label="Your profile"><svg viewBox="0 0 146 146" aria-hidden="true"><circle cx="73" cy="73" r="73" fill="#fff"/><circle cx="73" cy="58" r="26" fill="#9ea3ad"/><path d="M27 124c6-25 25-38 46-38s40 13 46 38a72 72 0 0 1-92 0Z" fill="#9ea3ad"/></svg><img id="me-pic-img" alt="" hidden></button>
+    <button class="me-name" id="me-name" aria-label="Your profile"></button>
+    <button class="menu" id="open-menu" aria-label="Profile">
+      <svg viewBox="0 0 19 17"><rect y="0" width="19" height="2.6" rx="1.3"/><rect y="7.2" width="19" height="2.6" rx="1.3"/><rect y="14.4" width="19" height="2.6" rx="1.3"/></svg>
+    </button>
+    <p class="bal-label">Current Balance</p>
+    <i class="bal-dot"></i>
+    <p class="bal-amount" id="balance">₹ 0</p>
+
+    <button class="pill pill-credit" id="add-credit">CREDIT</button>
+    <button class="pill pill-debit" id="add-debit">DEBIT</button>
+
+    <div class="tabs" role="tablist">
+      <i class="tab-ind" id="tab-ind"></i>
+      <button class="tab" role="tab" data-tab="analysis">Analysis</button>
+      <button class="tab" role="tab" data-tab="history">History</button>
+    </div>
+
+    <!-- History (frame 4:67) -->
+    <div class="view v-history" id="v-history" hidden>
+      <h2 class="kept">I’ve kept track of your money</h2>
+      <button class="chip chip-date" id="chip-date">Date to Date</button>
+      <button class="chip chip-sort" id="chip-sort">Sort by</button>
+      <ul class="tx-list" id="tx-list"></ul>
+      <p class="empty" id="tx-empty" hidden>No entries yet. Tap <b>CREDIT</b> or <b>DEBIT</b> to add one.</p>
+    </div>
+
+    <!-- Analysis (frame 2:30) -->
+    <div class="view v-analysis" id="v-analysis" hidden>
+      <section class="card c-spend">
+        <header class="c-head"><h3>Spending by Category</h3><button class="range" data-range="month">This Month</button></header>
+        <div class="spend-body">
+          <div class="pix-wrap"><svg class="pix" id="pix" viewBox="0 0 150 150" aria-hidden="true"></svg><div class="pix-mid"><b id="pix-total">₹0</b><span>Total Spent</span></div></div>
+          <ul class="sp-legend" id="sp-legend"></ul>
+        </div>
+      </section>
+      <section class="card c-break">
+        <header class="c-head"><h3>Category Breakdown</h3><button class="range" data-range="month">This Month</button></header>
+        <ul class="bk-list" id="bk-list"></ul>
+      </section>
+      <section class="card c-month">
+        <header class="c-head"><h3>Monthly Expenses</h3><button class="range" data-range="year">This Year</button></header>
+        <div class="mchart"><div class="m-axis" id="m-axis"></div><div class="m-bars" id="m-bars"></div></div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<!-- ============ Add Expense (frame 4:86) ============ -->
+<div class="overlay" id="pop-debit" hidden>
+  <form class="sheet sheet-debit" id="form-debit" autocomplete="off" novalidate>
+    <button type="button" class="sh-close" aria-label="Close">&times;</button>
+    <h2 class="sh-title">Add Expense</h2>
+    <label class="field f-amount"><input name="amount" inputmode="decimal" placeholder="Amount" aria-label="Amount" maxlength="12"></label>
+    <div class="picker">
+      
+      <ul class="pk-list" id="list-debit" role="listbox"></ul>
+    </div>
+    <button class="done" type="submit">Done</button>
+  </form>
+</div>
+
+<!-- ============ Add credited money (frame 4:104) ============ -->
+<div class="overlay" id="pop-credit" hidden>
+  <form class="sheet sheet-credit" id="form-credit" autocomplete="off" novalidate>
+    <button type="button" class="sh-close" aria-label="Close">&times;</button>
+    <h2 class="sh-title">Add credited money</h2>
+    <label class="field f-amount"><input name="amount" inputmode="decimal" placeholder="Amount" aria-label="Amount" maxlength="12"></label>
+    <div class="picker">
+      
+      <ul class="pk-list" id="list-credit" role="listbox"></ul>
+    </div>
+    <button class="done" type="submit">Done</button>
+  </form>
+</div>
+
+<!-- ============ Login / Sign up ============ -->
+<div class="overlay" id="pop-auth" hidden>
+  <form class="sheet sheet-auth" id="form-auth" novalidate>
+    <h2 class="sh-title" id="auth-title">Login</h2>
+    <div class="auth-fields" id="auth-fields"></div>
+    <p class="auth-err" id="auth-err" role="alert"></p>
+    <button class="done" type="submit">Done</button>
+    <p class="auth-switch"><span id="auth-q">New here?</span> <button type="button" id="auth-swap">Sign up</button></p>
+  </form>
+</div>
+
+<!-- ============ Profile drawer (frame 10:362) ============ -->
+<div class="overlay ov-drawer" id="pop-menu" hidden>
+  <aside class="drawer" id="drawer">
+    <div class="avatar" id="avatar"><svg class="av-default" viewBox="0 0 146 146" aria-hidden="true"><circle cx="73" cy="73" r="73" fill="#fff"/><circle cx="73" cy="58" r="26" fill="#9ea3ad"/><path d="M27 124c6-25 25-38 46-38s40 13 46 38a72 72 0 0 1-92 0Z" fill="#9ea3ad"/></svg><img id="avatar-img" alt="" hidden></div>
+    <button class="av-btn av-edit" id="av-edit"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M8.2 1.4l2.4 2.4-6.6 6.6H1.6V8z" fill="currentColor"/></svg>Edit</button>
+    <button class="av-btn av-remove" id="av-remove"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 3h8M4.6 3V1.8h2.8V3M3 3l.6 7.4c0 .5.4.8.9.8h3c.5 0 .9-.3.9-.8L9 3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Remove</button>
+    <input type="file" id="av-file" accept="image/jpeg,image/png,image/webp" hidden>
+
+    <div class="pf pf-1" data-key="name"><input value="" placeholder="Full name" aria-label="Full name" maxlength="50" readonly><button class="pf-edit" aria-label="Edit full name"><img src="img/edit.png" alt=""></button></div>
+    <div class="pf pf-2" data-key="username"><input value="" placeholder="Username" aria-label="Username" maxlength="20" readonly autocapitalize="none"><button class="pf-edit" aria-label="Edit username"><img src="img/edit.png" alt=""></button></div>
+    <div class="pf pf-3" data-key="email"><input value="" placeholder="Email" aria-label="Email" maxlength="120" readonly type="email" autocapitalize="none"></div>
+
+    <a class="contact-btn" href="https://atharvadevelops.vercel.app/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4A1.5 1.5 0 0 1 4 14.5v-9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Contact</a>
+    <button class="logout" id="logout">Log Out</button>
+    <button class="del-acc" id="del-acc">Delete account</button>
+  </aside>
+</div>
+
+<!-- ============ Delete account (password check) ============ -->
+<div class="overlay ov-top" id="pop-delete" hidden>
+  <form class="sheet sheet-del" id="form-delete" novalidate>
+    <h2 class="sh-title">Delete account</h2>
+    <p class="del-note">This permanently deletes your account and every entry. Enter your password to confirm.</p>
+    <label class="field f-pass"><input name="password" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" maxlength="200"></label>
+    <p class="auth-err" id="del-err" role="alert"></p>
+    <div class="del-row"><button type="button" class="del-cancel" id="del-cancel">Cancel</button><button type="submit" class="del-go">Delete</button></div>
+  </form>
+</div>
+
+<!-- ============ Crop profile photo ============ -->
+<div class="overlay ov-top" id="pop-crop" hidden>
+  <div class="sheet sheet-crop">
+    <h2 class="sh-title">Crop photo</h2>
+    <div class="crop-box" id="crop-box"><img id="crop-img" alt="" draggable="false"><i class="crop-ring"></i></div>
+    <p class="crop-tip">Drag to move · pinch or slide to zoom</p>
+    <input type="range" class="crop-zoom" id="crop-zoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom">
+    <div class="del-row"><button type="button" class="del-cancel" id="crop-cancel">Cancel</button><button type="button" class="crop-save" id="crop-save">Save</button></div>
+  </div>
+</div>
+
+<!-- date + sort menus -->
+<div class="pop-menu" id="menu-date" hidden>
+  <label>From <input type="date" id="d-from"></label>
+  <label>To <input type="date" id="d-to"></label>
+  <div class="pm-row"><button type="button" id="d-clear" class="pm-ghost">Clear</button><button type="button" id="d-apply" class="pm-main">Apply</button></div>
+</div>
+<div class="pop-menu" id="menu-sort" hidden>
+  <button data-sort="new">Newest first</button>
+  <button data-sort="old">Oldest first</button>
+  <button data-sort="high">Highest amount</button>
+  <button data-sort="low">Lowest amount</button>
+</div>
+
+<div class="pop-menu" id="menu-range" hidden>
+  <button data-r="month">This Month</button>
+  <button data-r="last">Last Month</button>
+  <button data-r="year">This Year</button>
+  <button data-r="all">All Time</button>
+</div>
+
+<!-- ============ AI quick entry: speak or type ============ -->
+<form class="ai-dock" id="ai-dock" autocomplete="off" novalidate>
+  <div class="ai-result" id="ai-result" hidden></div>
+  <div class="ai-bar">
+    <span class="ai-spark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9L12 2.5Z" fill="currentColor"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" fill="currentColor" opacity=".7"/></svg></span>
+    <input id="ai-text" maxlength="300" placeholder="Spent 250 on uber, got 5000 salary…" aria-label="Describe what you spent or received">
+    <button type="button" class="ai-mic" id="ai-mic" aria-label="Speak"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button type="submit" class="ai-send" id="ai-send" aria-label="Add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+</form>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
