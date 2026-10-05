@@ -258,7 +258,7 @@ app.use("/api", (req, res) => res.status(404).json({ error: "Not found." }));
 const PUBLIC = path.join(__dirname, "..", "public");
 app.use(express.static(PUBLIC, {
   dotfiles: "ignore",
-  setHeaders(res, f) { res.setHeader("Cache-Control", /\.(png|jpe?g|woff2|svg)$/.test(f) ? "public, max-age=604800" : "no-cache"); },
+  setHeaders(res, f) { res.setHeader("Cache-Control", /\.(png|jpe?g|woff2|svg)$/.test(f) ? "public, max-age=0, must-revalidate" : "no-cache"); },
 }));
 app.use((req, res) => res.sendFile(path.join(PUBLIC, "index.html")));
 

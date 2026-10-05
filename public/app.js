@@ -25,7 +25,7 @@
     ],
     credit: [["Salary", "salary"], ["Allowance", "allowance"]],
   };
-  const ICON = Object.fromEntries([...CATS.debit, ...CATS.credit].map(([n, f]) => [n, `img/${f}.png`]));
+  const ICON = Object.fromEntries([...CATS.debit, ...CATS.credit].map(([n, f]) => [n, `img/${f}.png?v=2`]));
   const CAT_COLOR = { Food: "#ff2d2d", Fuel: "#ff8a1f", Shopping: "#ffd21f", Alcohol: "#2bd45b", Travel: "#1f8bff", Maintenance: "#8b5cf6", Bills: "#ff4fa3", Groceries: "#ff6fb5", Coke: "#22d3ee", Custom: "#e5e5e5" };
   const DESIGN_ORDER = ["Food", "Fuel", "Shopping", "Alcohol", "Travel", "Maintenance", "Bills", "Groceries", "Coke", "Custom"];
 
@@ -685,24 +685,23 @@
   }, 1000);
 
   /* ---------- AI quick entry: speak or type, it picks credit/debit + category ---------- */
-  const dock = $("#ai-dock"), aiText = $("#ai-text"), aiRes = $("#ai-result"), aiSend = $("#ai-send"), aiMic = $("#ai-mic");
+  const orb = $("#ai-orb"), aiRes = $("#ai-result"), listen = $("#ai-listen"), heardEl = $("#ai-heard");
   let aiTimer;
   function showAiResult(html, err = false, ms = 7000) {
     aiRes.innerHTML = html; aiRes.classList.toggle("err", err); aiRes.hidden = false;
     aiRes.style.animation = "none"; void aiRes.offsetWidth; aiRes.style.animation = "";
     clearTimeout(aiTimer); aiTimer = setTimeout(() => (aiRes.hidden = true), ms);
   }
-  async function aiSubmit() {
-    const text = aiText.value.trim();
-    if (!text) { aiText.focus(); return; }
-    dock.classList.add("busy"); aiSend.disabled = true;
+  async function aiSubmit(text) {
+    text = (text || "").trim();
+    if (!text) return;
+    orb.classList.add("busy");
     try {
       const r = await api("/api/ai/parse", { method: "POST", body: { text } });
       state.txs.unshift(...r.added.slice().reverse());
       state.txs.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
       render(true);
       const b = $("#balance"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
-      aiText.value = "";
       const ids = r.added.map((t) => t.id);
       showAiResult(`<div class="ai-res-head"><span>Added ${r.added.length} ${r.added.length > 1 ? "entries" : "entry"}</span><button type="button" class="ai-undo">Undo</button></div>` +
         r.added.map((t) => `<div class="ai-row">${icon(t.category)}<b>${esc(t.category)}</b><span class="amt ${t.type}"><i>${t.type === "credit" ? "+" : "–"}</i>₹${num(t.amount)}</span></div>`).join(""));
@@ -717,29 +716,82 @@
     } catch (err) {
       if (err.status === 401) return logoutLocal();
       showAiResult(esc(err.message), true, 4500);
-    } finally { dock.classList.remove("busy"); aiSend.disabled = false; }
+    } finally { orb.classList.remove("busy"); }
   }
-  dock.addEventListener("submit", (e) => { e.preventDefault(); stopListening(); aiSubmit(); });
-
-  // microphone (Chrome, Edge, Safari): speech → text → added automatically
+  // tap the orb: starts listening at once. Tap again (or the screen) before it confirms to cancel.
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec = null, heard = "";
-  function stopListening() { if (rec) { try { rec.stop(); } catch {} } }
-  if (!SR) aiMic.hidden = true;
-  aiMic.addEventListener("click", () => {
-    if (rec) return stopListening();
-    rec = new SR(); heard = "";
-    rec.lang = navigator.language && navigator.language.startsWith("en") ? navigator.language : "en-IN";
-    rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
-    rec.onstart = () => { dock.classList.add("listening"); aiText.value = ""; aiText.placeholder = "Listening… say it like “spent 200 on food”"; };
-    rec.onresult = (e) => { heard = [...e.results].map((x) => x[0].transcript).join(" "); aiText.value = heard; };
-    rec.onerror = (e) => { if (e.error === "not-allowed" || e.error === "service-not-allowed") toast("Allow microphone access to speak", true); else if (e.error !== "no-speech" && e.error !== "aborted") toast("Couldn't hear that. Try again.", true); };
-    rec.onend = () => {
-      dock.classList.remove("listening"); aiText.placeholder = "Spent 250 on uber, got 5000 salary…"; rec = null;
-      if (heard.trim()) aiSubmit();
+  let rec = null, heard = "", cancelled = false, confirmTimer = null;
+  function closeListen() {
+    clearTimeout(confirmTimer); confirmTimer = null;
+    listen.hidden = true; listen.classList.remove("live", "confirm", "has"); document.body.classList.remove("ai-on");
+  }
+  function cancelListen() {
+    cancelled = true;
+    if (rec) { try { rec.abort(); } catch {} rec = null; }
+    closeListen();
+  }
+  orb.addEventListener("click", () => {
+    if (rec || confirmTimer) return cancelListen();
+    if (!SR) return toast("Voice isn't supported in this browser", true);
+    cancelled = false; heard = "";
+    const r = rec = new SR();
+    r.lang = navigator.language && navigator.language.startsWith("en") ? navigator.language : "en-IN";
+    r.interimResults = true; r.maxAlternatives = 1; r.continuous = false;
+    r.onstart = () => { heardEl.textContent = ""; listen.classList.remove("has"); listen.hidden = false; listen.classList.add("live"); document.body.classList.add("ai-on"); };
+    r.onresult = (e) => { heard = [...e.results].map((x) => x[0].transcript).join(" "); heardEl.textContent = heard; listen.classList.toggle("has", !!heard.trim()); };
+    r.onerror = (e) => { if (e.error === "not-allowed" || e.error === "service-not-allowed") toast("Allow microphone access to speak", true); else if (e.error !== "no-speech" && e.error !== "aborted") toast("Couldn't hear that. Try again.", true); };
+    r.onend = () => {
+      if (rec !== r) return; // cancelled or replaced
+      rec = null;
+      if (cancelled || !heard.trim()) return closeListen();
+      // short grace period to cancel before it is added
+      listen.classList.remove("live"); listen.classList.add("confirm");
+      confirmTimer = setTimeout(() => { confirmTimer = null; const t = heard; closeListen(); aiSubmit(t); }, 1600);
     };
-    try { rec.start(); } catch { rec = null; toast("Microphone isn't available here", true); }
+    try { r.start(); } catch { rec = null; toast("Microphone isn't available here", true); }
   });
+  listen.addEventListener("click", cancelListen);
+
+  /* ---------- the AI orb: a dotted, wobbling sphere in blue / purple / pink / red ---------- */
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const orbs = $$(".orb-cv").map((cv) => {
+    const n = +cv.dataset.n || 400, pts = [], ga = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < n; i++) { const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = ga * i; pts.push([Math.cos(th) * r, y, Math.sin(th) * r]); }
+    return { cv, ctx: cv.getContext("2d"), pts, w: 0 };
+  });
+  function drawOrb(o, t) {
+    const { cv, ctx, pts } = o, dpr = Math.min(devicePixelRatio || 1, 2), size = cv.clientWidth;
+    if (!size) return;
+    if (o.w !== size) { cv.width = cv.height = Math.round(size * dpr); o.w = size; }
+    const live = document.body.classList.contains("ai-on"), sp = live ? 2.2 : 1, T = t * 0.001 * sp;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, size, size);
+    const R = size * 0.4, c = size / 2, big = size > 100, ca = Math.cos(T * 0.45), sa = Math.sin(T * 0.45), tilt = 0.35, ct = Math.cos(tilt), st = Math.sin(tilt);
+    const dots = [];
+    for (const [x0, y0, z0] of pts) {
+      // soft organic wobble along the surface
+      const w = 1 + 0.17 * Math.sin(x0 * 2.6 + T * 1.3) * Math.cos(y0 * 2.2 - T * 0.9) + 0.1 * Math.sin(z0 * 3.1 + y0 * 1.7 + T * 1.7);
+      const x1 = x0 * w, y1 = y0 * w, z1 = z0 * w;
+      const x = x1 * ca + z1 * sa, z2 = -x1 * sa + z1 * ca, y = y1 * ct - z2 * st, z = y1 * st + z2 * ct;
+      const p = 1 / (1.9 - z * 0.5);
+      // red/pink on top -> purple -> blue at the bottom, slowly drifting
+      const k = Math.min(1, Math.max(0, (y1 + 1) / 2 + 0.12 * Math.sin(T * 0.8 + x0 * 2 + z0 * 2)));
+      const hue = (350 - k * 120 + 360) % 360;
+      dots.push([c + x * R * p * 1.9, c + y * R * p * 1.9, z, hue, k]);
+    }
+    dots.sort((a, b) => a[2] - b[2]);
+    const base = big ? 1.5 : 0.95;
+    for (const [px, py, z, hue, k] of dots) {
+      const front = (z + 1) / 2;
+      ctx.globalAlpha = 0.18 + 0.82 * front * front;
+      ctx.fillStyle = `hsl(${hue} 88% ${46 + front * 22}%)`;
+      ctx.beginPath(); ctx.arc(px, py, base * (0.45 + front * 0.85), 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  (function orbLoop(t) {
+    if (!document.hidden) for (const o of orbs) if (o.cv.offsetParent) drawOrb(o, reduceMotion ? 3000 : t);
+    if (!reduceMotion) requestAnimationFrame(orbLoop);
+  })(0);
 
   /* ---------- show / hide on every password box ---------- */
   const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path class="slash" d="M4 4l16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';

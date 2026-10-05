@@ -106,6 +106,7 @@
     <p class="bal-amount" id="balance">₹ 0</p>
 
     <button class="pill pill-credit" id="add-credit">CREDIT</button>
+    <button class="ai-orb" id="ai-orb" aria-label="Speak to add an entry"><canvas class="orb-cv" data-n="380"></canvas></button>
     <button class="pill pill-debit" id="add-debit">DEBIT</button>
 
     <div class="tabs" role="tablist">
@@ -243,16 +244,12 @@
   <button data-r="all">All Time</button>
 </div>
 
-<!-- ============ AI quick entry: speak or type ============ -->
-<form class="ai-dock" id="ai-dock" autocomplete="off" novalidate>
-  <div class="ai-result" id="ai-result" hidden></div>
-  <div class="ai-bar">
-    <span class="ai-spark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9L12 2.5Z" fill="currentColor"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" fill="currentColor" opacity=".7"/></svg></span>
-    <input id="ai-text" maxlength="300" placeholder="Spent 250 on uber, got 5000 salary…" aria-label="Describe what you spent or received">
-    <button type="button" class="ai-mic" id="ai-mic" aria-label="Speak"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    <button type="submit" class="ai-send" id="ai-send" aria-label="Add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-  </div>
-</form>
+<!-- ============ AI quick entry: tap the orb and speak ============ -->
+<div class="ai-dock" id="ai-dock"><div class="ai-result" id="ai-result" hidden></div></div>
+<div class="ai-listen" id="ai-listen" hidden aria-live="polite">
+  <p class="ai-say"><span>&ldquo;</span><b id="ai-heard"></b><span>&rdquo;</span></p>
+  <button type="button" class="ai-lmic" id="ai-lmic" aria-label="Cancel"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+</div>
 
 <div class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
